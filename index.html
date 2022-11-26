@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palette</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+
+<style>
+    body {
+        text-align: center;
+        color: var(--tg-theme-text-color);
+        background: var(--tg-theme-bg-color);
+        font-family: 'Roboto Condensed', sans-serif;
+    }
+
+    main {
+        padding: 8px;
+    }
+
+    .input {
+        display: block;
+        width: 100%;
+        aspect-ratio: 1;
+        border: none;
+        border-radius: 100%;
+        background-color: var(--tg-theme-button-color, #50a8eb);
+        color: var(--tg-theme-button-text-color, gray);
+        cursor: pointer;
+    }
+
+    .main-button {
+        display: block;
+        width: 100%;
+        margin: 15px 0;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 1.5rem;
+        background-color: var(--tg-theme-button-color, #50a8eb);
+        color: var(--tg-theme-button-text-color, #ffffff);
+        cursor: pointer;
+        }
+
+    .palette {
+        display: flex;
+        flex-wrap: wrap;
+        position: relative;
+    }
+
+    .background {
+        width: 50%;
+        text-align: center;
+    }
+
+    .text {
+        position: absolute;
+        left: 65%;
+        text-align: center;
+        width: 35%;
+    }
+
+    .description {
+        display: flex;
+        flex-wrap: wrap;
+        position: relative;
+        padding-bottom: 5px;
+    }
+
+    label {
+        color: var(--tg-theme-button-text-color, black);
+        font-size: 0.9rem;
+        font-weight: 300;
+        font-style: initial;
+        text-align: center;
+    }
+
+    div.color {
+        position: absolute;
+        width: 20%;
+        aspect-ratio: 1;
+        outline: 0px solid;
+    }
+
+    div.color:nth-child(2) {
+        position: relative;
+    }
+
+    div.color:nth-child(2) {
+        left: 15%;
+    }
+
+    div.color:nth-child(3) {
+        left: 30%;
+    }
+
+    div.color:nth-child(4) {
+        left: 65%;
+    }
+
+    div.color:nth-child(5) {
+        left: 80%;
+    }
+
+    .line {
+        background-color: var(--tg-theme-secondary-bg-color, #50a8eb);
+        width: 100%;
+        height: 5px;
+        visibility: visible;
+    }
+
+    #color-picker {
+        position: relative;
+        width: 100%;
+        height: 150px;
+        margin-top: 20px;
+        /* outline: 3px solid;
+        outline-color: var(--tg-theme-secondary-bg-color, #50a8eb); */
+        cursor: pointer;
+    }
+
+    .color-cursor {
+        position: absolute;
+        border-radius: 100%;
+        visibility: hidden;
+        width:  20px;
+        height: 20px;
+        z-index: 10000;
+        color: rgba(0, 0, 0, 0);
+        box-shadow: 0px 0px 0px 1px black;        
+    }
+
+</style>
+
+<body>
+    <main>
+    
+    <div class="description">
+        <div class="background">
+            <label>Background color</label>
+        </div>
+        <div class="text">
+            <label>Text color</label>
+        </div>
+    </div>
+
+    <div class="palette" id="palette">
+        <div class="color"">
+            <button class="input" onclick="selectColor(this)" id="bg" name="bg" value="#ffa656"></button>
+        </div>
+        <div class="color"">
+            <button class="input" onclick="selectColor(this)" id="primary" name="bg" value="#ff6600"></button>
+        </div>
+        <div class="color"">
+            <button class="input" onclick="selectColor(this)" id="secondary" name="bg" value="#ffd084"></button>
+        </div>
+        <div class="color"">
+            <button class="input" onclick="selectColor(this)" id="accent" name="bg" value="#3d0606"></button>
+        </div>
+        <div class="color"">
+            <button class="input" onclick="selectColor(this)" id="additional" name="bg" value="#822900"></button>
+        </div>
+    </div>
+
+    <div class="color-cursor" id="cursor"></div>
+    <canvas id="color-picker"></canvas>
+
+    <button class="main-button" onclick="savePalette()">Save palette</button>
+    <!-- <div class="line"></div> -->
+
+    </main>
+
+</body>
+<script src="color-picker.js""></script>
+<script>
+//https://stackoverflow.com/questions/49974145/how-to-convert-rgba-to-hex-color-code-using-javascript
+function rgba2hex(rgba, forceRemoveAlpha=false) {
+    if (rgba[0] == "#") return rgba;
+    return "#" + rgba.replace(/^rgba?\(|\s+|\)$/g, '') // Get's rgba / rgb string values
+    .split(',') // splits them at ","
+    .filter((string, index) => !forceRemoveAlpha || index !== 3)
+    .map(string => parseFloat(string)) // Converts them to numbers
+    .map((number, index) => index === 3 ? Math.round(number * 255) : number) // Converts alpha to 255 number
+    .map(number => number.toString(16)) // Converts numbers to hex
+    .map(string => string.length === 1 ? "0" + string : string) // Adds 0 when length of one number is 1
+    .join("") // Puts the array to togehter to a string
+}
+</script>
+<script>
+    window.addEventListener("load", (event) => {
+        let color = document.cookie.split(";")[0];
+        console.log({color});
+        if (color) {
+            let colorValues = color.split("=")[1].split(",");
+            document.getElementById("bg").value = colorValues[0];
+            document.getElementById("primary").value = colorValues[1];
+            document.getElementById("secondary").value = colorValues[2];
+            document.getElementById("accent").value = colorValues[3];
+            document.getElementById("additional").value = colorValues[4];
+        }
+
+        //console.log(colorValues);
+        document.getElementById("bg").style.background = document.getElementById("bg").value;
+        document.getElementById("primary").style.background = document.getElementById("primary").value;
+        document.getElementById("secondary").style.background = document.getElementById("secondary").value;
+        document.getElementById("accent").style.background = document.getElementById("accent").value;
+        document.getElementById("additional").style.background = document.getElementById("additional").value;
+    });
+
+    Telegram.WebApp.ready();
+    //Telegram.WebApp.expand();
+
+    function savePalette() {
+        let data = {
+            "bg": rgba2hex(document.getElementById("bg").value, true),
+            "primary": rgba2hex(document.getElementById("primary").value, true),
+            "secondary": rgba2hex(document.getElementById("secondary").value, true),
+            "accent": rgba2hex(document.getElementById("accent").value, true),
+            "additional": rgba2hex(document.getElementById("additional").value, true)
+        }
+        console.log(data);
+        document.cookie = `color=${Object.values(data).join(",")}; expires=${365*24*60*60}; path=/`;
+	    Telegram.WebApp.sendData(JSON.stringify(data)); 
+        Telegram.WebApp.close();
+    }
+</script>
+</html>
