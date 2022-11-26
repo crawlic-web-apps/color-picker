@@ -41,7 +41,7 @@ function initColorPicker() {
     ctx.fillRect(0, 0, canvas.width, canvas.height)
   
     canvas.onclick = function(e) {
-        Telegram.WebApp.HapticFeedback.selectionChanged();
+        Telegram.WebApp.HapticFeedback.notificationOccurred("success");
         const x = (e.offsetX / canvas.clientWidth) * canvas.width;
         const y = (e.offsetY / canvas.clientHeight) * canvas.height;
         let imgData = ctx.getImageData(x, y, 1, 1);
@@ -54,6 +54,7 @@ function initColorPicker() {
         cursor.style.top = `${e.clientY - 10}px`;
         currentColor.style.background = color;
         currentColor.value = color;
+        setCookie();
     }
   }
   

@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 
@@ -176,7 +177,6 @@
     </main>
 
 </body>
-<script src="color-picker.js""></script>
 <script>
 //https://stackoverflow.com/questions/49974145/how-to-convert-rgba-to-hex-color-code-using-javascript
 function rgba2hex(rgba, forceRemoveAlpha=false) {
@@ -193,6 +193,11 @@ function rgba2hex(rgba, forceRemoveAlpha=false) {
 </script>
 <script>
     window.addEventListener("load", (event) => {
+
+        if ((navigator.userAgent.match(/iPhone/)) || (navigator.userAgent.match(/iPod/)) || (navigator.userAgent.match(/macOS/))) {
+            document.body.style.fontFamily = "'SF Pro Display', sans-serif";
+        }
+
         let color = document.cookie.split(";")[0];
         console.log({color});
         if (color) {
@@ -215,7 +220,7 @@ function rgba2hex(rgba, forceRemoveAlpha=false) {
     Telegram.WebApp.ready();
     //Telegram.WebApp.expand();
 
-    function savePalette() {
+    function setCookie() {
         let data = {
             "bg": rgba2hex(document.getElementById("bg").value, true),
             "primary": rgba2hex(document.getElementById("primary").value, true),
@@ -225,8 +230,14 @@ function rgba2hex(rgba, forceRemoveAlpha=false) {
         }
         console.log(data);
         document.cookie = `color=${Object.values(data).join(",")}; expires=${365*24*60*60}; path=/`;
+        return data;
+    }
+
+    function savePalette() {
+        data = setCookie();
 	    Telegram.WebApp.sendData(JSON.stringify(data)); 
         Telegram.WebApp.close();
     }
 </script>
+<script src="color-picker.js""></script>
 </html>
