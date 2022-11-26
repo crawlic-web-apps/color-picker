@@ -235,6 +235,7 @@ function rgba2hex(rgba, forceRemoveAlpha=false) {
 
     function savePalette() {
         data = setCookie();
+        Telegram.WebApp.HapticFeedback.notificationOccurred("success");
 	    Telegram.WebApp.sendData(JSON.stringify(data)); 
         Telegram.WebApp.close();
     }
